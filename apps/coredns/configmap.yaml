@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-lan
+  namespace: lan-dns
+data:
+  Corefile: |
+    k8s.home.arpa:53 {
+        errors
+        file /etc/coredns/db.k8s.home.arpa k8s.home.arpa {
+            reload 30s
+        }
+    }
+
+    .:53 {
+        errors
+        health :8080
+        ready :8181
+        cache 60
+        forward . 1.1.1.1 9.9.9.9
+    }
+
+  db.k8s.home.arpa: |
+    $ORIGIN k8s.home.arpa.
+    $TTL 60
+
+    @ IN SOA ns1.k8s.home.arpa. hostmaster.k8s.home.arpa. (
+        2026111401
+        3600
+        600
+        604800
+        60
+    )
+
+    @ IN NS ns1.k8s.home.arpa.
+
+    ns1 IN A 192.168.1.241
+    api IN A 192.168.1.38
+    *   IN A 192.168.1.240
