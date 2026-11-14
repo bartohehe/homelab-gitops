@@ -20,7 +20,7 @@ spec:
   tls:
     - hosts:
         - mymind.k8s.home.arpa
-      secretName: homelab-wildcard
+      secretName: homelab-tls
   rules:
     - host: mymind.k8s.home.arpa
       http:
