@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-tls
+  namespace: argocd
+spec:
+  secretName: argocd-tls
+  duration: 2160h
+  renewBefore: 360h
+  dnsNames:
+    - argocd.k8s.home.arpa
+  privateKey:
+    rotationPolicy: Always
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
