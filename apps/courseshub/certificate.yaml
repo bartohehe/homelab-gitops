@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: courseshub-tls
+  namespace: courseshub
+spec:
+  secretName: courseshub-tls
+  dnsNames:
+    - courseshub.k8s.home.arpa
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    rotationPolicy: Always
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

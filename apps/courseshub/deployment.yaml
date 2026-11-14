@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courseshub
+  namespace: courseshub
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: courseshub
+  template:
+    metadata:
+      labels:
+        app: courseshub
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: courseshub
+          image: ghcr.io/bartohehe/courseshub:sha-2ff56f3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: ADDR
+              value: ':8080'
+            - name: WEB_DIR
+              value: /app/web
+            - name: DB_PATH
+              value: /data/courses.db
+            - name: COURSES_DIR
+              value: /data/courses
+            - name: MAX_UPLOAD_MB
+              value: '50'
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: courseshub-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: courseshub
+  namespace: courseshub
+spec:
+  type: ClusterIP
+  selector:
+    app: courseshub
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
