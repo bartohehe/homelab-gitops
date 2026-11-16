@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamelogg
+  namespace: gamelogg
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gamelogg
+  template:
+    metadata:
+      labels:
+        app: gamelogg
+    spec:
+      containers:
+        - name: gamelogg
+          image: ghcr.io/bartohehe/gamelogg:sha-66d4c87
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: gamelogg-config
+            - secretRef:
+                name: gamelogg-secrets
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gamelogg
+  namespace: gamelogg
+spec:
+  type: ClusterIP
+  selector:
+    app: gamelogg
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

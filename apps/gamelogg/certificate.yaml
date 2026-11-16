@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gamelogg-tls
+  namespace: gamelogg
+spec:
+  secretName: gamelogg-tls
+  dnsNames:
+    - gamelogg.k8s.home.arpa
+  duration: 2160h
+  renewBefore: 360h
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

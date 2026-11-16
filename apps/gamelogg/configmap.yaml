@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gamelogg-config
+  namespace: gamelogg
+data:
+  AUTH_ENABLED: "true"
+  MEDIA_ENABLED: "true"
+  TRANSLATION_ENABLED: "true"
+  PORT: "8080"
+  APP_ENV: "production"

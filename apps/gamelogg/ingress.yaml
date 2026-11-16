@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gamelogg
+  namespace: gamelogg
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - gamelogg.k8s.home.arpa
+      secretName: gamelogg-tls
+  rules:
+    - host: gamelogg.k8s.home.arpa
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gamelogg
+                port:
+                  number: 8080
